@@ -1,0 +1,21 @@
+{
+  "backend": "tokenizers",
+  "bos_token": "<|bos|>",
+  "eos_token": "<|eos|>",
+  "extra_special_tokens": [
+    "<|im_start|>",
+    "<|im_end|>",
+    "<|thought_start|>",
+    "<|thought_end|>",
+    "<|tool_call_start|>",
+    "<|tool_call_end|>",
+    "<|tool_result_start|>",
+    "<|tool_result_end|>",
+    "<|mcp_server_decl|>",
+    "<|mcp_server_end|>"
+  ],
+  "model_max_length": 1000000000000000019884624838656,
+  "pad_token": "<|pad|>",
+  "tokenizer_class": "TokenizersBackend",
+  "unk_token": "<|unk|>"
+}
