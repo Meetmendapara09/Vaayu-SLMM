@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vaayu"
-version = "1.0.5"
+version = "1.1.0"
 description = "Vaayu: 245M & 492M Small Language Model (SLM) for Machine-to-Machine Tool Calling with Native MCP"
 readme = "README_PYPI.md"
 requires-python = ">=3.10"

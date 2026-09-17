@@ -14,10 +14,13 @@
 ## Key Features
 
 - **Embedded & Local**: Runs entirely locally on consumer CPUs and GPUs with low memory footprint (~245M to 492M parameters).
-- **Native MCP Support**: Direct, first-class connection to Model Context Protocol servers over standard I/O (`stdio`) and Server-Sent Events (`SSE`).
-- **Structured Tool Calling**: Emits precise tool calls in structured JSON formats with built-in schema compliance.
-- **Low Latency**: Sub-50ms Time-To-First-Token (TTFT) on modern consumer CPUs with Grouped Query Attention (4:1 GQA).
-- **Self-Contained**: Clean Python package on top of PyTorch—zero complex orchestration frameworks or proxy daemons required.
+- **In-Process Tool Decorator (`@ai.tool`)**: Register standard Python functions directly with automatic JSON schema and type hint introspection.
+- **Batteries-Included Tools**: Sandboxed Filesystem, Shell execution, SQLite query engine, and HTTP REST tools ready out-of-the-box (`ai.enable_default_tools()`).
+- **Real-Time Streaming & Observability**: Stream thoughts, tool calls, tool results, and text tokens via `stream_chat` and `StreamEvent`.
+- **OpenAI-Compatible Local REST Server**: Drop-in OpenAI API replacement (`vaayu serve`) compatible with LangChain, LlamaIndex, Ollama UIs, and CrewAI.
+- **Structured Pydantic Validation**: Force machine outputs to strictly conform to Pydantic models or JSON schemas via `generate_structured()`.
+- **Native MCP Support**: Direct, first-class connection to Model Context Protocol servers over standard I/O (`stdio`).
+- **Ultra-Low Latency**: Sub-50ms Time-To-First-Token (TTFT) on consumer CPUs with Grouped Query Attention (4:1 GQA).
 
 ---
 
@@ -29,66 +32,138 @@ pip install vaayu
 
 ---
 
-## Quickstart
+## Quickstart Guide
 
-### 1. Load Pretrained Model from Hugging Face
+### 1. In-Process Tools with Python Decorator (`@ai.tool`)
 
-You can load official weights directly from the Hugging Face Hub:
+Register any standard Python function as an executable tool. Type hints and docstrings are automatically parsed into JSON Schema:
 
 ```python
 from vaayu import Vaayu
 
-# Load official Vaayu-Base directly from Hugging Face Hub
 ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
 
-# Generate response
-response = ai.chat("Explain the purpose of Model Context Protocol (MCP) in one concise sentence.")
+@ai.tool
+def get_stock_quote(ticker: str, currency: str = "USD") -> str:
+    """Fetches real-time market quote for a stock ticker."""
+    return f"{ticker}: $185.40 {currency}"
+
+response = ai.chat("What is the current stock quote for AAPL?")
 print(response)
 ```
 
-### 2. Connect to Local MCP Tools
+### 2. Batteries-Included Standard Tools
 
-Vaayu natively discovers and invokes tools provided by MCP servers:
+Equip Vaayu with sandboxed filesystem access, HTTP fetch, and SQLite capabilities in a single line:
 
 ```python
 from vaayu import Vaayu
 
 ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
 
-# Connect to any local MCP server (e.g. filesystem or custom service)
+# Enables Filesystem, HTTP, and SQLite tools sandboxed to current directory
+ai.enable_default_tools(workspace="./data")
+
+response = ai.chat("Search for all *.json files in the workspace and inspect their content.")
+print(response)
+```
+
+### 3. Real-Time Streaming & Observability
+
+Monitor thoughts, tool invocations, and text generation as they occur:
+
+```python
+from vaayu import Vaayu
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+
+for event in ai.stream_chat("Fetch the latest git commit logs"):
+    if event.type == "thought":
+        print(f"[Reasoning] {event.content}", end="", flush=True)
+    elif event.type == "tool_call":
+        print(f"\n[Invoking {event.tool_name} with {event.arguments}]")
+    elif event.type == "tool_result":
+        print(f"[Result: {event.content}]")
+    elif event.type == "text":
+        print(event.content, end="", flush=True)
+```
+
+### 4. Pydantic Structured Outputs
+
+Enforce strict JSON schema compliance with Pydantic models:
+
+```python
+from pydantic import BaseModel
+from vaayu import Vaayu
+
+class UserExtraction(BaseModel):
+    name: str
+    email: str
+    role: str
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+user = ai.generate_structured(
+    "Extract user info: Alex Morgan (alex.morgan@example.com) is a Lead Systems Architect.",
+    response_model=UserExtraction
+)
+print(user.name, user.role)
+# Alex Morgan Lead Systems Architect
+```
+
+### 5. Native Model Context Protocol (MCP) Tools
+
+Connect directly to external MCP servers running via `stdio`:
+
+```python
+from vaayu import Vaayu
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+
+# Connect to any local MCP server
 ai.attach_mcp_server(
     command="npx",
     args=["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
 )
 
-# Run an agentic prompt with tool execution
-result = ai.agent_step("Read the file config.json and list all defined settings.")
+result = ai.chat("Read the file config.json and list all defined settings.")
 print(result)
-```
-
-### 3. Load Local Checkpoints
-
-If you have trained or downloaded local weights:
-
-```python
-from vaayu import Vaayu
-
-ai = Vaayu.load_local("checkpoints/vaayu_base/vaayu_final.pt", variant="base")
-print(ai.chat("Hello, Vaayu!"))
 ```
 
 ---
 
-## Command Line Interface (CLI)
+## OpenAI-Compatible Local HTTP Server
 
-Vaayu comes with an interactive CLI for chatting, testing tools, and inspecting weights:
+Serve Vaayu locally as an OpenAI-compatible REST API:
 
 ```bash
-# Start an interactive chat session with Hugging Face weights
-vaayu chat --repo meetmendapara/Vaayu-Base
+# Start server on port 8000
+vaayu serve --port 8000 --model meetmendapara/Vaayu-Base
+```
 
-# Or chat with a local checkpoint
-vaayu chat --weights checkpoints/vaayu_base/vaayu_final.pt
+Use with the official `openai` Python SDK, LangChain, or curl:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(base_url="http://127.0.0.1:8000/v1", api_key="not-needed")
+
+response = client.chat.completions.create(
+    model="vaayu-base",
+    messages=[
+        {"role": "user", "content": "Hello! List the files in the directory."}
+    ]
+)
+print(response.choices[0].message.content)
+```
+
+---
+
+## Interactive Developer REPL
+
+Test prompts and tools in an interactive terminal session:
+
+```bash
+vaayu repl
 ```
 
 ---

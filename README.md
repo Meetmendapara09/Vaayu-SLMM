@@ -108,68 +108,120 @@ pip install -e .
 
 ## Quickstart
 
-### 1. Load Pretrained Weights Directly from Hugging Face Hub
+### 1. In-Process Python Tool Decorator (`@ai.tool`)
+
+Equip Vaayu with custom Python functions using `@ai.tool`. Schema and type signatures are automatically parsed:
 
 ```python
 from vaayu import Vaayu
 
-# Stream architecture, tokenizer, and weights from Hugging Face Hub
 ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
 
-# In-process inference
-response = ai.chat("Explain the purpose of Model Context Protocol (MCP) in one concise sentence.")
+@ai.tool
+def get_weather(city: str, metric: bool = True) -> str:
+    """Fetches real-time weather information for a specified city."""
+    unit = "°C" if metric else "°F"
+    return f"{city}: 22{unit}, Sunny with mild breeze"
+
+response = ai.chat("What is the current weather in Tokyo?")
 print(response)
 ```
 
-### 2. Connect to Local Model Context Protocol (MCP) Servers
+### 2. Batteries-Included Standard Tools
 
-Vaayu connects directly to any MCP server over standard input/output (`stdio`) and Server-Sent Events (`SSE`):
+Equip Vaayu with sandboxed filesystem access, HTTP fetch, SQLite, and shell execution in one command:
 
 ```python
 from vaayu import Vaayu
 
 ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
 
-# Connect to any local MCP server (e.g. filesystem, sqlite, terminal, git)
+# Enables Filesystem, HTTP, SQLite tools sandboxed to current directory
+ai.enable_default_tools(workspace="./workspace")
+
+response = ai.chat("List all files in the directory and summarize package.json.")
+print(response)
+```
+
+### 3. Real-Time Streaming & Observability
+
+Stream thoughts, tool calls, and text tokens with full event observability:
+
+```python
+from vaayu import Vaayu
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+
+for event in ai.stream_chat("Read the logfile and summarize errors"):
+    if event.type == "thought":
+        print(f"[Reasoning] {event.content}", end="")
+    elif event.type == "tool_call":
+        print(f"\n[Tool Call] {event.tool_name}({event.arguments})")
+    elif event.type == "tool_result":
+        print(f"[Tool Result] {event.content}")
+    elif event.type == "text":
+        print(event.content, end="")
+```
+
+### 4. Pydantic Structured Outputs
+
+Force Vaayu to generate outputs strictly adhering to Pydantic models:
+
+```python
+from pydantic import BaseModel
+from vaayu import Vaayu
+
+class ServerConfig(BaseModel):
+    hostname: str
+    port: int
+    ssl_enabled: bool
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+cfg = ai.generate_structured(
+    "Extract config: Server listening at web.internal.org on port 8443 with HTTPS active.",
+    response_model=ServerConfig
+)
+print(cfg.hostname, cfg.port, cfg.ssl_enabled)
+```
+
+### 5. Connect to Local Model Context Protocol (MCP) Servers
+
+Vaayu connects directly to any external MCP server over standard input/output (`stdio`):
+
+```python
+from vaayu import Vaayu
+
+ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
+
+# Connect to external MCP server (e.g. filesystem, sqlite, git)
 ai.attach_mcp_server(
     command="npx",
     args=["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
 )
 
-# Run autonomous agentic step
-result = ai.agent_step("Find all Python configuration files and list their paths.")
+result = ai.chat("Find all Python configuration files and list their paths.")
 print(result)
 ```
 
-### 3. Registering In-Process Host Tools
+### 6. Local OpenAI-Compatible REST Server
 
-```python
-from vaayu import Vaayu
+Start a local drop-in OpenAI-compatible server on port 8000:
 
-ai = Vaayu.from_pretrained("meetmendapara/Vaayu-Base")
-
-def get_system_metrics():
-    import psutil
-    return {"cpu": psutil.cpu_percent(), "memory": psutil.virtual_memory().percent}
-
-ai.register_function(
-    name="get_system_metrics",
-    description="Retrieve live CPU and RAM usage percentages of the host system.",
-    input_schema={"type": "object", "properties": {}},
-    func=get_system_metrics
-)
-
-response = ai.chat("What is the current CPU utilization?")
-print(response)
+```bash
+vaayu serve --port 8000 --model meetmendapara/Vaayu-Base
 ```
 
-### 4. Loading Local Checkpoints
+Connect via OpenAI SDK, LangChain, LlamaIndex, or curl:
 
 ```python
-from vaayu import Vaayu
+from openai import OpenAI
 
-ai = Vaayu.load_local("checkpoints/vaayu_base/vaayu_final.pt", variant="base")
-print(ai.chat("Hello, Vaayu!"))
+client = OpenAI(base_url="http://127.0.0.1:8000/v1", api_key="vaayu-local")
+response = client.chat.completions.create(
+    model="vaayu-base",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)
 ```
 
 ---
@@ -198,17 +250,23 @@ Inspect the production configuration file at 'config/settings.yaml'.<|im_end|>
 
 ## Command Line Interface (CLI)
 
-The `vaayu` package provides an interactive terminal CLI:
+The `vaayu` CLI provides tools for interaction, serving, and benchmarking:
 
 ```bash
-# Interactive chat with official Hugging Face release
-vaayu chat --repo meetmendapara/Vaayu-Base
+# Display model specifications and environment
+vaayu info
 
-# Chat with local checkpoint
-vaayu chat --weights checkpoints/vaayu_base/vaayu_final.pt
+# Interactive developer REPL session
+vaayu repl
 
-# Inspect model configurations
-vaayu info --repo meetmendapara/Vaayu-Base
+# Run prompt with streaming and default tools
+vaayu chat "Check git status and summarize modified files" --stream --tools
+
+# Start OpenAI-compatible HTTP server
+vaayu serve --port 8000 --model meetmendapara/Vaayu-Base
+
+# Run BFCL v3 benchmark evaluation
+vaayu benchmark --limit 50 --variant base
 ```
 
 ---

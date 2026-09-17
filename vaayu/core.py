@@ -111,6 +111,51 @@ class VaayuInferenceEngine:
         full_output = self.tokenizer.decode(generated[0].tolist(), skip_special_tokens=False)
         return full_output[len(prompt):]
 
+    @torch.no_grad()
+    def stream_generate(
+        self,
+        prompt: str,
+        max_new_tokens: int = 512,
+        temperature: float = 0.6,
+        top_k: int = 40,
+        stop_at_tool_call: bool = False
+    ) -> Generator[str, None, None]:
+        """Streams generated tokens one by one as they are decoded."""
+        input_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(self.device)
+        generated = input_ids.clone()
+        past_key_values = None
+
+        for _ in range(max_new_tokens):
+            if past_key_values is None:
+                outputs = self.model(generated, use_cache=True)
+            else:
+                outputs = self.model(generated[:, -1:], past_key_values=past_key_values, use_cache=True)
+
+            past_key_values = outputs["past_key_values"]
+            logits = outputs["logits"][:, -1, :]
+
+            if temperature > 0:
+                logits = logits / temperature
+                if top_k > 0:
+                    v, _ = torch.topk(logits, min(top_k, logits.size(-1)))
+                    logits[logits < v[:, [-1]]] = -float("Inf")
+                probs = F.softmax(logits, dim=-1)
+                next_token = torch.multinomial(probs, num_samples=1)
+            else:
+                next_token = torch.argmax(logits, dim=-1, keepdim=True)
+
+            token_id = next_token.item()
+            generated = torch.cat([generated, next_token], dim=-1)
+
+            if token_id == self.im_end_id:
+                break
+
+            token_text = self.tokenizer.decode([token_id], skip_special_tokens=False)
+            yield token_text
+
+            if stop_at_tool_call and token_id == self.tool_call_end_id:
+                break
+
     def extract_tool_calls(self, text: str) -> List[ToolCall]:
         """Extracts all JSON tool calls enclosed within <|tool_call_start|> and <|tool_call_end|>."""
         pattern = r"<\|tool_call_start\|>(.*?)<\|tool_call_end\|>"
