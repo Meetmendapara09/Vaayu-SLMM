@@ -1,0 +1,18 @@
+{
+  "id": "mendaparameet/vaayu-slmm-training",
+  "title": "Vaayu SLMM Training",
+  "code_file": "train_on_kaggle.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "thedevastator/ai-chatbot-conversational-data",
+    "renato2marinho/vinkius-mcp-registry"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
