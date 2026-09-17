@@ -12,9 +12,9 @@
 
 </div>
 
-**Vaayu** is an open-source **Small Language Model (SLM)** family—also characterized as a **Tool Language Model (TLM)**—engineered from scratch for local execution, direct in-process application embedding, and native **Model Context Protocol (MCP)** tool calling.
+**Vaayu** is an open-source Small Language Model (SLM) family built for local execution, direct in-process Python embedding, and Model Context Protocol (MCP) tool calling.
 
-Unlike standard conversational chatbots trained on open-ended dialogue, Vaayu is engineered as a **machine-centric runtime engine**: trained end-to-end directly on structured JSON-RPC 2.0 schemas, dynamic tool contracts, parallel multi-tool dispatch, and low-latency autonomous local agent loops.
+Instead of general-purpose chat, Vaayu focuses on machine-to-machine workflows: structured JSON schemas, dynamic tool selection, parallel execution, and low-latency local agent loops.
 
 > *Note: Model Context Protocol (MCP) is an open standard designed by [Anthropic](https://modelcontextprotocol.io/).*
 
@@ -81,12 +81,12 @@ Evaluated on the **Vaayu MCP Benchmark Suite** (200 curated scenarios across 4 c
 
 ## Architectural Highlights
 
-- **From Scratch Base Tool Model**: Not an adapter or distillation. Every weight was initialized randomly and trained end-to-end on tool and machine schemas.
-- **Grouped Query Attention (4:1 GQA)**: Shares key/value heads across 4 query heads, reducing KV-cache allocation by 75% for accelerated local decoding.
-- **SwiGLU Gated Feed-Forward Networks**: Gated bilinear activation function with 256-byte tensor core alignment delivering superior representation capacity.
-- **Rotary Position Embeddings (RoPE)**: Relative position encoding providing clean structured attention over token sequences.
-- **Atomic Tool Calling Grammar**: Specialized tokens (`<|tool_call_start|>`, `<|tool_call_end|>`, `<|tool_result_start|>`, `<|tool_result_end|>`, `<|mcp_server_decl|>`) prevent syntax hallucination and markdown leakage.
-- **Self-Contained Deployment**: Ships as a lightweight Python package on top of PyTorch—zero external agent frameworks or proxy daemons required.
+- **Trained from Scratch**: Built on an independent Transformer decoder architecture initialized from scratch (not an adapter, LoRA, or distillation of Llama/Qwen).
+- **Grouped Query Attention (4:1 GQA)**: 4 query heads per key/value head, reducing KV-cache footprint by 75% for faster local decoding.
+- **SwiGLU Feed-Forward Networks**: Gated activation with 256-byte tensor alignment.
+- **Rotary Position Embeddings (RoPE)**: Relative position encoding across token sequences.
+- **Atomic Tool Grammar**: Dedicated control tokens (`<|tool_call_start|>`, `<|tool_call_end|>`, `<|tool_result_start|>`, `<|tool_result_end|>`, `<|mcp_server_decl|>`) prevent markdown leakage and format hallucination.
+- **Self-Contained Package**: Python package on top of PyTorch with no external runtime daemons or proxy processes needed.
 
 ---
 

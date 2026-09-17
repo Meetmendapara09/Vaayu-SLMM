@@ -2,13 +2,13 @@
 
 ## 1. Executive Summary
 
-**Vaayu** is an open-source **Small Language Model (SLM) for machine-to-machine tool calling** (also characterized as a **Tool Language Model / TLM**), purposefully engineered for local execution, direct in-process software embedding, and native **Model Context Protocol (MCP)** tool execution.
+**Vaayu** is an open-source Small Language Model (SLM) designed for machine-to-machine tool calling and local software integration using the Model Context Protocol (MCP).
 
-Unlike general-purpose conversational LLMs that require heavy orchestration frameworks and multi-billion parameter clouds, Vaayu is engineered to be:
-1. **Ultra-compact**: 245 Million parameters (~490MB in FP16, ~245MB in 8-bit, ~125MB in 4-bit).
-2. **In-Process Embeddable**: Lives directly inside desktop applications, IDE extensions, CLI utilities, and local microservices without separate proxy daemons.
-3. **Machine-Centric**: Pretrained end-to-end directly on structured JSON-RPC 2.0 schemas, dynamic tool contracts, typed argument validation, and execution handshakes.
-4. **Trained from Scratch**: Built on its own custom Transformer decoder architecture with clean random initialization—a genuine base foundation model rather than an adapter, LoRA, or post-hoc fine-tune.
+Unlike large general-purpose models, Vaayu is designed to be:
+1. **Compact**: 245M parameters (~490MB in FP16, ~245MB in 8-bit, ~125MB in 4-bit).
+2. **In-Process Embeddable**: Runs directly inside desktop applications, IDE extensions, CLI utilities, and local microservices without separate background daemons.
+3. **Tool-Focused**: Pretrained directly on structured JSON-RPC 2.0 schemas, dynamic tool contracts, typed argument validation, and execution handshakes.
+4. **Trained from Scratch**: Built on an independent Transformer decoder architecture with random initialization (not an adapter, LoRA, or post-hoc fine-tune).
 
 ---
 

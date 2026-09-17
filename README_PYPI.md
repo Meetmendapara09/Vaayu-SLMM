@@ -5,7 +5,7 @@
 [![Hugging Face (Vaayu-Base)](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Vaayu--Base-blue)](https://huggingface.co/meetmendapara/Vaayu-Base)
 [![Hugging Face (Vaayu-Large)](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Vaayu--Large-blue)](https://huggingface.co/meetmendapara/Vaayu-Large)
 
-**Vaayu** is an ultra-lightweight, embeddable **Small Language Model (SLM)** family—also characterized as a **Tool Language Model (TLM)**—engineered specifically for local machine execution, application integration, and native **Model Context Protocol (MCP)** tool calling.
+**Vaayu** is an open-source Small Language Model (SLM) family built for local machine execution, application integration, and Model Context Protocol (MCP) tool calling.
 
 > *Note: Model Context Protocol (MCP) is an open specification designed by [Anthropic](https://modelcontextprotocol.io/).*
 
@@ -13,14 +13,14 @@
 
 ## Key Features
 
-- **Embedded & Local**: Runs entirely locally on consumer CPUs and GPUs with low memory footprint (~245M to 492M parameters).
-- **In-Process Tool Decorator (`@ai.tool`)**: Register standard Python functions directly with automatic JSON schema and type hint introspection.
-- **Batteries-Included Tools**: Sandboxed Filesystem, Shell execution, SQLite query engine, and HTTP REST tools ready out-of-the-box (`ai.enable_default_tools()`).
+- **Embedded & Local**: Runs locally on consumer CPUs and GPUs with low memory overhead (245M and 492M parameters).
+- **In-Process Tool Decorator (`@ai.tool`)**: Register standard Python functions directly with automatic type inspection and JSON Schema generation.
+- **Built-in Tools**: Sandboxed filesystem access, shell execution, SQLite, and HTTP REST tools ready out-of-the-box (`ai.enable_default_tools()`).
 - **Real-Time Streaming & Observability**: Stream thoughts, tool calls, tool results, and text tokens via `stream_chat` and `StreamEvent`.
-- **OpenAI-Compatible Local REST Server**: Drop-in OpenAI API replacement (`vaayu serve`) compatible with LangChain, LlamaIndex, Ollama UIs, and CrewAI.
-- **Structured Pydantic Validation**: Force machine outputs to strictly conform to Pydantic models or JSON schemas via `generate_structured()`.
-- **Native MCP Support**: Direct, first-class connection to Model Context Protocol servers over standard I/O (`stdio`).
-- **Ultra-Low Latency**: Sub-50ms Time-To-First-Token (TTFT) on consumer CPUs with Grouped Query Attention (4:1 GQA).
+- **OpenAI-Compatible Local REST Server**: Drop-in OpenAI API replacement (`vaayu serve`) compatible with LangChain, LlamaIndex, OpenWebUI, and CrewAI.
+- **Structured Pydantic Validation**: Parse and validate model outputs against Pydantic models or JSON schemas via `generate_structured()`.
+- **Native MCP Support**: Connect directly to Model Context Protocol servers over standard I/O (`stdio`).
+- **Low Latency**: Sub-50ms Time-To-First-Token (TTFT) on modern CPUs using Grouped Query Attention (4:1 GQA).
 
 ---
 

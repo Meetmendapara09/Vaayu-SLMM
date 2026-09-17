@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-**Vaayu-Large** is the flagship 492-Million parameter Small Language Machine Model (SLMM) variant designed to push the boundaries of embedded local machine models while strictly adhering to the 200M–500M parameter limit.
+**Vaayu-Large** is a 492M parameter model variant designed for complex multi-turn workflows, larger tool sets, and extended context (4,096 tokens) within a sub-500M parameter footprint.
 
 ---
 

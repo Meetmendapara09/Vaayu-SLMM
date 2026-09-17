@@ -50,9 +50,9 @@ library_name: vaayu
 
 </div>
 
-**{repo_name}** is an open-source **Small Language Model (SLM)**—also characterized as a **Tool Language Model (TLM)**—with **{exact_params} parameters**, trained completely **from scratch** for local execution, in-process embedding, and native **Model Context Protocol (MCP)** tool execution.
+**{repo_name}** is an open-source Small Language Model (SLM) with **{exact_params} parameters**, trained from scratch for local execution, in-process Python embedding, and Model Context Protocol (MCP) tool execution.
 
-Unlike standard conversational chatbots trained on open-ended dialogue, Vaayu is engineered as a **machine-centric runtime engine**: trained end-to-end directly on structured JSON-RPC 2.0 schemas, dynamic tool contracts, and autonomous local agent loops.
+Instead of general-purpose chat, {repo_name} focuses on machine workflows: structured JSON schemas, tool selection, argument validation, and local agent loops.
 
 > *Note: Model Context Protocol (MCP) is an open specification designed by [Anthropic](https://modelcontextprotocol.io/).*
 

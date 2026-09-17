@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-Vaayu is a **base real model** trained from scratch—it is **not** an existing open-source checkpoint (like LLaMA, Mistral, or Qwen) with fine-tuning or LoRA applied. 
+Vaayu is a base model trained from scratch. It is not an existing open-source checkpoint (such as LLaMA, Mistral, or Qwen) with fine-tuning or LoRA applied. 
 
 To honor the **under 12-hour compute limit** while training a **245M parameter** model:
 - The training job executes remotely on **Kaggle accelerated online GPUs** (NVIDIA T4 / P100 with high-bandwidth memory).

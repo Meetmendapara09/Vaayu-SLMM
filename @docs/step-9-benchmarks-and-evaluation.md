@@ -2,20 +2,20 @@
 
 ## 1. Overview
 
-To provide transparent, reproducible empirical evidence of **Vaayu**'s tool-calling precision, we evaluate both **Vaayu-Base (245M)** and **Vaayu-Large (492M)** across two comprehensive evaluation suites:
-1. **Berkeley Function Calling Leaderboard (BFCL v3) Standardized Suite** (`eval/bfcl_standard_benchmark.py`): 250 curated test cases adhering to the official UC Berkeley Gorilla / BFCL taxonomy for AST-level syntax correctness, multi-schema routing, parallel dispatch, and irrelevance abstention.
-2. **Vaayu MCP Benchmark Suite** (`eval/mcp_benchmark.py`): 200 real-world Model Context Protocol (MCP) tool-use scenarios evaluating schema fidelity and autonomous multi-turn error correction.
+We evaluate both **Vaayu-Base (245M)** and **Vaayu-Large (492M)** across two evaluation suites:
+1. **Berkeley Function Calling Leaderboard (BFCL v3) Standardized Suite** (`eval/bfcl_standard_benchmark.py`): 250 test cases following the UC Berkeley Gorilla / BFCL taxonomy for AST syntax validation, multi-schema routing, parallel dispatch, and relevance detection.
+2. **Vaayu MCP Benchmark Suite** (`eval/mcp_benchmark.py`): 200 real-world Model Context Protocol (MCP) tool scenarios testing schema adherence and multi-turn error correction.
 
 ---
 
 ## 2. Standardized BFCL Benchmark Results & Industry Comparison
 
-The Berkeley Function Calling Leaderboard (BFCL) assesses models on executable function calling across 5 core categories:
+The Berkeley Function Calling Leaderboard (BFCL) assesses models on function calling across 5 categories:
 1. **Simple Function Calling**: Single function invocation with typed arguments.
-2. **Multiple Function Selection**: Routing among 3–6 candidate schemas without hallucinating extraneous tools.
+2. **Multiple Function Selection**: Routing among 3 to 6 candidate schemas without selecting extraneous tools.
 3. **Parallel Tool Calling**: Dispatching multiple distinct tool calls in a single generation turn.
-4. **Relevance Detection & Abstention**: Correctly abstaining from calling tools when queries are non-actionable or purely conversational.
-5. **Error Self-Correction**: Ingesting environment error traces and recovering zero-shot.
+4. **Relevance Detection & Abstention**: Abstaining from calling tools when queries are conversational.
+5. **Error Self-Correction**: Ingesting execution errors and recovering in the next turn.
 
 ### Comparative Leaderboard Matrix
 
