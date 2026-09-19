@@ -358,6 +358,22 @@ Complete engineering specifications are available in the [`@docs/`](./@docs) dir
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/Meetmendapara09/Vaayu-SLMM}}
 }
+@misc{meet_mendapara_2026,
+	author       = { Meet Mendapara },
+	title        = { Vaayu-Base (Revision 1e100ee) },
+	year         = 2026,
+	url          = { https://huggingface.co/meetmendapara/Vaayu-Base },
+	doi          = { 10.57967/hf/10508 },
+	publisher    = { Hugging Face }
+}
+@misc{meet_mendapara_2026,
+	author       = { Meet Mendapara },
+	title        = { Vaayu-Large (Revision ac591dd) },
+	year         = 2026,
+	url          = { https://huggingface.co/meetmendapara/Vaayu-Large },
+	doi          = { 10.57967/hf/10507 },
+	publisher    = { Hugging Face }
+}
 ```
 
 ---
